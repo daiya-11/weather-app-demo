@@ -1,0 +1,9 @@
+resources:
+  - deployment.yaml
+  - api-key-secret.yaml
+  - mongo-credentials.yaml
+  - mongo-db-service.yaml
+  - mongo-db.yaml
+  - ingress.yaml
+  - service.yaml
+

@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: weather-app-demo-deployment
+spec:
+  template:
+    spec:
+      containers:
+        - name: weather-app-demo-container
+          image: registry/weather-app-demo:v2.0.0 
+          env:
+            - name: MONGO_URI
+              value: "mongodb://$(MONGO_USER):$(MONGO_PASSWORD)@mongo-db-service:27017/weather-db-dev"  
+          resources:
+            requests:
+              memory: "128Mi" 
+              cpu: "200m"
+            limits:
+              memory: "256Mi"
+              cpu: "300m"

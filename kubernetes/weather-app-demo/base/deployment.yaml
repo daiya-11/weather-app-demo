@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: weather-app-demo-deployment
+  labels:
+    app: weather-app-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: weather-app-demo
+  template:
+    metadata:
+      labels:
+        app: weather-app-demo
+    spec:
+      containers:
+        - name: weather-app-demo-container
+          image: europe-central2-docker.pkg.dev/weather-app-demo-447410/weather-app-demo-images/weather-app-demo:v1.0.1
+          ports:
+            - containerPort: 5000
+          env:
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: api-key-secret
+                  key: api_key
+            - name: MONGO_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-credentials
+                  key: MONGO_USER
+            - name: MONGO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-credentials
+                  key: MONGO_PASSWORD
+            - name: MONGO_URI
+              value: "mongodb://$(MONGO_USER):$(MONGO_PASSWORD)@mongo-service:27017/weather-db-staging"
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "128Mi"
+              cpu: "200m"
+      restartPolicy: Always
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+

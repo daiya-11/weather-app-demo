@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: weather-app-demo-ingress
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: weather-app.34.116.165.112.nip.io
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: weather-app-demo-service
+            port:
+              number: 5000
+
+

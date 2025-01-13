@@ -1,0 +1,8 @@
+bases:
+  - ../../base
+
+patchesStrategicMerge:
+  - deployment-patch.yaml
+  - ingress.yaml
+  - mongo-credentials-patch.yaml
+  - mongo-db-patch.yaml
