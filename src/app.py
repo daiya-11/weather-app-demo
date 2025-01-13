@@ -12,7 +12,7 @@ BASE_URL = "https://api.openweathermap.org/data/2.5/weather"
 # MongoDB Connection
 mongo_user = os.getenv('MONGO_USER')
 mongo_password = os.getenv('MONGO_PASSWORD')
-mongo_uri = os.getenv('MONGO_URI', f"mongodb://{mongo_user}:{mongo_password}@mongo-service:27017/weather-db-staging")
+mongo_uri = os.getenv('MONGO_URI', f"mongodb://{mongo_user}:{mongo_password}@mongo-service:27017/weather-db-staging?authSource=admin")
 
 # Create MongoDB client
 client = MongoClient(mongo_uri)
@@ -67,4 +67,3 @@ def save_api_data():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
-
