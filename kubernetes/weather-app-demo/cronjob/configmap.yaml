@@ -4,26 +4,55 @@ metadata:
   name: rotation-scripts
 data:
   rotate.sh: |-
-    #!/bin/bash
+    #!/bin/sh
     set -e
 
-    # Überprüfe, ob das Passwort base64-codiert ist und dekodiere es, wenn notwendig
-    if echo "$MONGO_INITDB_ROOT_PASSWORD" | grep -q "="; then
-      CURRENT_PASS=$(echo $MONGO_INITDB_ROOT_PASSWORD | base64 -d)
-    else
-      CURRENT_PASS=$MONGO_INITDB_ROOT_PASSWORD
+    # Retrieve current username and password from the Secret
+    CURRENT_USER=$(kubectl get secret mongo-credentials -o jsonpath="{.data.MONGO_INITDB_ROOT_USERNAME}" | base64 -d 2>/dev/null || echo "")
+    CURRENT_PASS=$(kubectl get secret mongo-credentials -o jsonpath="{.data.MONGO_INITDB_ROOT_PASSWORD}" | base64 -d 2>/dev/null || echo "")
+
+    # Debugging output to check values
+    echo "Retrieved username (Base64-decoded): $CURRENT_USER"
+    echo "Retrieved password (Base64-decoded): $CURRENT_PASS"
+
+    # Check if the username and password are not empty
+    if [ -z "$CURRENT_USER" ] || [ -z "$CURRENT_PASS" ]; then
+      echo "Error: Username or password is empty. Please check the 'mongo-credentials' secret."
+      exit 1
     fi
 
-    # Definiere das neue Passwort
+    echo "Current user: $CURRENT_USER"
+
+    # Generate a new username and password
+    NEW_USER=$(head /dev/urandom | tr -dc 'A-Za-z0-9' | head -c 16)
     NEW_PASS=$(head /dev/urandom | tr -dc 'A-Za-z0-9' | head -c 16)
 
-    # Ändere das MongoDB-Passwort
-    mongosh "mongodb://admin:$CURRENT_PASS@mongo-service.default.svc.cluster.local:27017/admin?authSource=admin" --eval "db.changeUserPassword('admin', '$NEW_PASS');" || exit 1
+    echo "New credentials: Username=$NEW_USER, Password=$NEW_PASS"
 
-    # Patch der Kubernetes Secret mit dem neuen Passwort (Base64-Kodierung)
-    kubectl patch secret mongo-credentials -p="{\"data\":{\"MONGO_INITDB_ROOT_PASSWORD\":\"$(echo -n $NEW_PASS | base64)\"}}"
+    # Connect to MongoDB with the current credentials and create a new user
+    mongosh "mongodb://$CURRENT_USER:$CURRENT_PASS@mongo-service.default.svc.cluster.local:27017/admin?authSource=admin" --eval "
+      db.createUser({
+        user: '$NEW_USER',
+        pwd: '$NEW_PASS',
+        roles: [{ role: 'root', db: 'admin' }]
+      });
+    " || exit 1
 
-    # Patch der Deployment zur Neustart-Anforderung
+    echo "New user has been successfully created."
+
+    # Update the Kubernetes Secret with the new credentials
+    kubectl patch secret mongo-credentials -p="{\"data\":{\"MONGO_INITDB_ROOT_USERNAME\":\"$(echo -n $NEW_USER | base64)\",\"MONGO_INITDB_ROOT_PASSWORD\":\"$(echo -n $NEW_PASS | base64)\"}}"
+
+    echo "Secrets have been updated."
+
+    # Connect to MongoDB with the new credentials and remove the old user
+    mongosh "mongodb://$NEW_USER:$NEW_PASS@mongo-service.default.svc.cluster.local:27017/admin?authSource=admin" --eval "
+      db.dropUser('$CURRENT_USER');
+    " || exit 1
+
+    echo "Old user has been deleted: Username=$CURRENT_USER"
+
+    # Trigger a restart for the deployment by patching the deployment's annotations
     kubectl patch deployment weather-app-demo-deployment -p "{\"spec\":{\"template\":{\"metadata\":{\"annotations\":{\"kubectl.kubernetes.io/restartedAt\":\"$(date +%Y-%m-%dT%H:%M:%S%z)\"}}}}}"
 
-
+    echo "Password rotation completed!"
