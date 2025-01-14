@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rotation-scripts
+data:
+  rotate.sh: |-
+    #!/bin/bash
+    set -e
+
+    # Überprüfe, ob das Passwort base64-codiert ist und dekodiere es, wenn notwendig
+    if echo "$MONGO_INITDB_ROOT_PASSWORD" | grep -q "="; then
+      CURRENT_PASS=$(echo $MONGO_INITDB_ROOT_PASSWORD | base64 -d)
+    else
+      CURRENT_PASS=$MONGO_INITDB_ROOT_PASSWORD
+    fi
+
+    # Definiere das neue Passwort
+    NEW_PASS=$(head /dev/urandom | tr -dc 'A-Za-z0-9' | head -c 16)
+
+    # Ändere das MongoDB-Passwort
+    mongosh "mongodb://admin:$CURRENT_PASS@mongo-service.default.svc.cluster.local:27017/admin?authSource=admin" --eval "db.changeUserPassword('admin', '$NEW_PASS');" || exit 1
+
+    # Patch der Kubernetes Secret mit dem neuen Passwort (Base64-Kodierung)
+    kubectl patch secret mongo-credentials -p="{\"data\":{\"MONGO_INITDB_ROOT_PASSWORD\":\"$(echo -n $NEW_PASS | base64)\"}}"
+
+    # Patch der Deployment zur Neustart-Anforderung
+    kubectl patch deployment weather-app-demo-deployment -p "{\"spec\":{\"template\":{\"metadata\":{\"annotations\":{\"kubectl.kubernetes.io/restartedAt\":\"$(date +%Y-%m-%dT%H:%M:%S%z)\"}}}}}"
+
+

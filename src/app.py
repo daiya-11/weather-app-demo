@@ -12,7 +12,7 @@ BASE_URL = "https://api.openweathermap.org/data/2.5/weather"
 # MongoDB Connection
 mongo_user = os.getenv('MONGO_USER')
 mongo_password = os.getenv('MONGO_PASSWORD')
-mongo_uri = os.getenv('MONGO_URI', f"mongodb://{mongo_user}:{mongo_password}@mongo-service:27017/weather-db-staging?authSource=admin")
+mongo_uri = os.getenv('MONGO_URI', f"mongodb://{mongo_user}:{mongo_password}@mongo-service.default.svc.cluster.local:27017/weather-db-staging?authSource=admin")
 
 # Create MongoDB client
 client = MongoClient(mongo_uri)
@@ -22,7 +22,7 @@ collection = db['collection']
 @app.route("/")
 def home():
     return jsonify({"message": "Welcome to the Weather app demo!"})
-
+    
 @app.route("/weather", methods=["GET"])
 def get_weather():
     city = request.args.get("city")
@@ -30,7 +30,7 @@ def get_weather():
         return jsonify({"error": "City parameter is required"}), 400
 
     try:
-        # Make a request to API with the city name
+        # API-Aufruf an OpenWeather mit der Stadt
         response = requests.get(BASE_URL, params={
             "q": city,
             "appid": api_key,
@@ -41,29 +41,39 @@ def get_weather():
             return jsonify({"error": "Failed to fetch weather data"}), response.status_code
 
         data = response.json()
+
+        # Wetterdaten für MongoDB vorbereiten
+        weather_data = {
+            "city": data.get("name"),
+            "temperature": data["main"]["temp"],
+            "description": data["weather"][0]["description"],
+            "timestamp": data["dt"]  # Zeitstempel des Wetterberichts
+        }
+
+        # Daten in MongoDB speichern
+        collection.insert_one(weather_data)
+
         return jsonify({
             "city": data.get("name"),
             "temperature": data["main"]["temp"],
             "description": data["weather"][0]["description"]
         })
+    
     except requests.exceptions.RequestException as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route('/save_api_data', methods=['GET'])
-def save_api_data():
-    api_url = "https://jsonplaceholder.typicode.com/posts"
-    try:
-        # Make a request to retrieve data
-        response = requests.get(api_url)
-        data = response.json()
-
-        # Insert data into MongoDB
-        result = collection.insert_many(data)
-        return jsonify({"message": f"Data saved to MongoDB! {len(result.inserted_ids)} documents inserted."})
-    except requests.exceptions.RequestException as e:
-        return jsonify({"error": str(e)}), 500
-    except Exception as e:
-        return jsonify({"error": f"Error saving data to MongoDB: {str(e)}"}), 500
+@app.route("/weather_from_db", methods=["GET"])
+def get_weather_data():
+    data = collection.find()
+    result = []
+    for record in data:
+        result.append({
+            "city": record["city"],
+            "temperature": record["temperature"],
+            "description": record["description"],
+            "timestamp": record["timestamp"]
+        })
+    return jsonify(result)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)

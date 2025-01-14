@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: mongo-credential-rotation
+spec:
+  schedule: "*/1 * * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: credential-rotator
+          containers:
+          - name: rotator
+            image: europe-central2-docker.pkg.dev/weather-app-demo-447410/weather-app-demo-images/mongo-rotation:latest
+            env:
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-credentials
+                  key: MONGO_INITDB_ROOT_PASSWORD
+            command: ["/bin/sh", "/scripts/rotate.sh"]
+            volumeMounts:
+            - name: rotation-scripts
+              mountPath: /scripts
+          volumes:
+          - name: rotation-scripts
+            configMap:
+              name: rotation-scripts
+              defaultMode: 0755
+          restartPolicy: OnFailure
