@@ -55,4 +55,4 @@ data:
     # Trigger a restart for the deployment by patching the deployment's annotations
     kubectl patch deployment weather-app-demo-deployment -p "{\"spec\":{\"template\":{\"metadata\":{\"annotations\":{\"kubectl.kubernetes.io/restartedAt\":\"$(date +%Y-%m-%dT%H:%M:%S%z)\"}}}}}"
 
-    echo "Password rotation completed!"
+    echo "Credential rotation completed!"
