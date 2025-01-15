@@ -37,11 +37,11 @@ Security: Kubernetes secrets are used to manage database credentials, and a Kube
 
 - Multi-Environment Support with Kustomize: Use Kustomize to manage configurations for different Kubernetes environments (dev, staging, production), making the application adaptable to multiple environments.
 
-Database Credential Rotation with Kubernetes CronJob: A Kubernetes CronJob automatically rotates database credentials (username and password) every minute, ensuring secure access to MongoDB and preventing downtime during credential changes.
+- Database Credential Rotation with Kubernetes CronJob: A Kubernetes CronJob automatically rotates database credentials (username and password) every minute, ensuring secure access to MongoDB and preventing downtime during credential changes.
 
-Ingress: Ingress is configured to manage external access to the application, ensuring secure communication between services and pods.
+- Ingress: Ingress is configured to manage external access to the application, ensuring secure communication between services and pods.
 
-Easy Setup and Deployment: The application is fully containerized with Docker, simplifying both local setup using Docker Compose and deployment to a Kubernetes cluster.
+- Easy Setup and Deployment: The application is fully containerized with Docker, simplifying both local setup using Docker Compose and deployment to a Kubernetes cluster.
 
 ## Technologies
 
@@ -90,23 +90,23 @@ This project uses Docker to containerize the application. Follow these steps to 
 
 2. **Build the Docker Image Locally**:
 
-   Navigate to the /src directory of the project and build the Docker image with the following command:
+Navigate to the /src directory of the project and build the Docker image with the following command:
 
-   ```bash
-   docker build -t weather-app-demo:v1.0.1 .
-   ```
+```bash
+docker build -t weather-app-demo:v1.0.1 .
+```
 
 3. **Install Docker Compose**: If you don’t have Docker Compose installed, follow the instructions on [Docker Compose installation](https://docs.docker.com/compose/install/).
 
 4. **Build and run the application with Docker Compose**:
 
-   Once Docker and Docker Compose are installed, run the following command to start the MongoDB service and the Flask app locally:
+Once Docker and Docker Compose are installed, run the following command to start the MongoDB service and the Flask app locally:
 
-   ```bash
-   docker compose up --build
-   ```
+```bash
+docker compose up --build
+```
 
-   This will build the Docker images and start the services defined in the `docker-compose.yml` file, including MongoDB and the Flask app.
+This will build the Docker images and start the services defined in the `docker-compose.yml` file, including MongoDB and the Flask app.
 
 ### 4. Verify local setup
 
@@ -118,63 +118,63 @@ To deploy the project on Google Kubernetes Engine (GKE), follow these additional
 
 1. **Set up Google Cloud SDK**: Install the Google Cloud SDK and authenticate your account.
 
-   [Install Google Cloud SDK](https://cloud.google.com/sdk/docs/install)
+[Install Google Cloud SDK](https://cloud.google.com/sdk/docs/install)
 
 2. **Create a GKE Cluster**:
 
-   Create a GKE cluster in the Google Cloud Console or use the following command:
+Create a GKE cluster in the Google Cloud Console or use the following command:
 
-   ```bash
-   gcloud container clusters create app-staging --zone europe-central2-a --num-nodes=2
-   ```
+```bash
+gcloud container clusters create app-staging --zone europe-central2-a --num-nodes=2
+```
 
 3. **Push Docker Image to GCP Artifact Registry**:
 
-   - Build and tag the Docker image:
+- Build and tag the Docker image:
 
-   ```bash
-   docker build -t gcr.io/your-project-id/weather-app-demo:v1 .
-   ```
+```bash
+docker build -t gcr.io/your-project-id/weather-app-demo:v1 .
+```
 
-   - Push the image to the Artifact Registry:
+- Push the image to the Artifact Registry:
 
-   ```bash
-   docker push gcr.io/your-project-id/weather-app:v1
-   ```
+```bash
+docker push gcr.io/your-project-id/weather-app:v1
+```
 
 4. **Deploy to GKE**:
 
-   This project uses **Kustomize** for Kubernetes deployments. Follow the steps below to deploy the application using Kustomize:
+This project uses **Kustomize** for Kubernetes deployments. Follow the steps below to deploy the application using Kustomize:
 
-   1. **Install Kustomize**:
+1. **Install Kustomize**:
 
-      To install **Kustomize**, follow the instructions on the official GitHub page:
+To install **Kustomize**, follow the instructions on the official GitHub page:
 
-      [Install Kustomize](https://github.com/kubernetes-sigs/kustomize/releases)
+[Install Kustomize](https://github.com/kubernetes-sigs/kustomize/releases)
 
-      Choose the appropriate method for your operating system from the release page.
+Choose the appropriate method for your operating system from the release page.
 
-   2. **Customize the Manifests**:
+2. **Customize the Manifests**:
 
-      After installing Kustomize, customize the Kubernetes manifests with your configuration:
+After installing Kustomize, customize the Kubernetes manifests with your configuration:
 
-      - Update the `image` name, environment variables, or any other settings in the manifests located in the /kubernetes/ directory according to your setup.
+- Update the `image` name, environment variables, or any other settings in the manifests located in the /kubernetes/ directory according to your setup.
 
-   3. **Deploy the Application**:
+3. **Deploy the Application**:
 
-      After customizing the manifests, you can deploy the application using the following command:
+After customizing the manifests, you can deploy the application using the following command:
 
-      ```bash
-      kubectl apply -k kubernetes/weather-app-demo/overlay/staging
-      ```
+```bash
+kubectl apply -k kubernetes/weather-app-demo/overlay/staging
+```
 
-   4. **Verify Deployment**:
+4. **Verify Deployment**:
 
-      Once the deployment is successful, check the status of your pods with:
+Once the deployment is successful, check the status of your pods with:
 
-      ```bash
-      kubectl get pods
-      ```
+```bash
+kubectl get pods
+```
 
 ### 6. Kubernetes Ingress and CronJob Setup
 
@@ -217,7 +217,7 @@ For example, if your service is exposed with an external IP of `12.34.56.78`, yo
 ## Usage
 
 To access the application, visit the following link:
-weather-app-staging.34.116.165.112.nip.io/
+[weather-app-staging.34.116.165.112.nip.io/](http://weather-app-staging.34.116.165.112.nip.io/)
 
 ### API Endpoints
 
