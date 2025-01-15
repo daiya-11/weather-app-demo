@@ -19,10 +19,12 @@ client = MongoClient(mongo_uri)
 db = client.get_database()  
 collection = db['collection']  
 
+# Route for the home page
 @app.route("/")
 def home():
     return jsonify({"message": "Welcome to the Weather app demo!"})
-    
+
+# Route to fetch weather data for a specified city    
 @app.route("/weather", methods=["GET"])
 def get_weather():
     city = request.args.get("city")
@@ -30,7 +32,7 @@ def get_weather():
         return jsonify({"error": "City parameter is required"}), 400
 
     try:
-        # API-Aufruf an OpenWeather mit der Stadt
+         # Make an API call to OpenWeather
         response = requests.get(BASE_URL, params={
             "q": city,
             "appid": api_key,
@@ -42,7 +44,7 @@ def get_weather():
 
         data = response.json()
 
-        # Wetterdaten für MongoDB vorbereiten
+        # Prepare the weather data to store in MongoDB
         weather_data = {
             "city": data.get("name"),
             "temperature": data["main"]["temp"],
@@ -50,9 +52,10 @@ def get_weather():
             "timestamp": data["dt"]  # Zeitstempel des Wetterberichts
         }
 
-        # Daten in MongoDB speichern
+        # Save the weather data to MongoDB
         collection.insert_one(weather_data)
 
+        # Return the weather data as a JSON response
         return jsonify({
             "city": data.get("name"),
             "temperature": data["main"]["temp"],
@@ -62,6 +65,7 @@ def get_weather():
     except requests.exceptions.RequestException as e:
         return jsonify({"error": str(e)}), 500
 
+# Return the weather data from the database as a JSON response
 @app.route("/weather_from_db", methods=["GET"])
 def get_weather_data():
     data = collection.find()
