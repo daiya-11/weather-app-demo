@@ -1,4 +1,4 @@
-# Project Name
+# Weather App Demo
 
 This project involves setting up a web server using Python to proxy requests to the public OpenWeather API. The application is containerized using Docker and connected to a MongoDB database via Docker. Docker Compose is used to run the services locally. A Kubernetes cluster on GCP GKE is used to orchestrate the solution in the cloud. The project includes configuring multiple environments (dev, staging, production) using Kustomize, setting up Ingress for external access. Additionally, a Kubernetes CronJob is implemented to rotate credentials (username and password) and ensure zero downtime during reconnections. The project was deployed on the GKE cluster in the staging environment.
 
