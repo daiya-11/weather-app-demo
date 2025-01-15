@@ -1,6 +1,6 @@
 # Project Name
 
-This project involves setting up a web server using Python to proxy requests to the public OpenWeather API. The application is containerized using Docker and connected to a MongoDB database via Docker. Docker Compose is used to run the services locally, and a Kubernetes cluster on GKE orchestrates the solution. The project includes configuring multiple environments (dev, staging, production) using Kustomize, setting up Ingress for pod communication, and managing database credentials securely using Kubernetes secrets. Additionally, a Kubernetes CronJob is implemented to rotate credentials (username and password) and ensure zero downtime during reconnections. The project was deployed on the GKE cluster in the staging environment.
+This project involves setting up a web server using Python to proxy requests to the public OpenWeather API. The application is containerized using Docker and connected to a MongoDB database via Docker. Docker Compose is used to run the services locally. A Kubernetes cluster on GCP GKE is used to orchestrate the solution in the cloud. The project includes configuring multiple environments (dev, staging, production) using Kustomize, setting up Ingress for external access. Additionally, a Kubernetes CronJob is implemented to rotate credentials (username and password) and ensure zero downtime during reconnections. The project was deployed on the GKE cluster in the staging environment.
 
 To access the application, visit the following link:
 [weather-app-staging.34.116.165.112.nip.io/](http://weather-app-staging.34.116.165.112.nip.io/)
@@ -23,7 +23,7 @@ MongoDB: Weather data is stored in MongoDB, allowing the retrieval of historical
 Docker: The application is containerized with Docker.
 Kubernetes: The application is orchestrated using Kubernetes, ensuring reliability and scalability across different environments (dev, staging, production).
 Kustomize: Environment-specific configurations are managed with Kustomize, enabling seamless deployments across multiple clusters.
-Security: Kubernetes secrets are used to manage database credentials securely, and a Kubernetes CronJob is implemented to rotate credentials automatically and ensure zero downtime during reconnections.
+Security: Kubernetes secrets are used to manage database credentials, and a Kubernetes CronJob is implemented to rotate credentials automatically for security and ensure zero downtime during reconnections.
 
 ## Features
 
@@ -39,7 +39,7 @@ Security: Kubernetes secrets are used to manage database credentials securely, a
 
 Database Credential Rotation with Kubernetes CronJob: A Kubernetes CronJob automatically rotates database credentials (username and password) every minute, ensuring secure access to MongoDB and preventing downtime during credential changes.
 
-Ingress and Secure Communication: Kubernetes Ingress is configured to manage external access to the application, ensuring secure communication between services and pods.
+Ingress: Ingress is configured to manage external access to the application, ensuring secure communication between services and pods.
 
 Easy Setup and Deployment: The application is fully containerized with Docker, simplifying both local setup using Docker Compose and deployment to a Kubernetes cluster.
 
@@ -58,7 +58,7 @@ This project utilizes the following technologies:
 - Google Kubernetes Engine (GKE): A managed Kubernetes service from Google Cloud Platform (GCP) used for deploying, managing, and scaling the application in a Kubernetes cluster.
 - Google Cloud Platform (GCP) Artifact Registry: A fully-managed service to store and manage Docker images in GCP, used for storing the application container images.
 - Kustomize: A tool for managing Kubernetes configurations across multiple environments.
-- This project uses [nip.io](https://nip.io/) for dynamic DNS management.
+- This project uses [nip.io](https://nip.io/) as free free DNS.
 
 ## Installation
 
@@ -93,7 +93,7 @@ This project uses Docker to containerize the application. Follow these steps to 
    Navigate to the /src directory of the project and build the Docker image with the following command:
 
    ```bash
-   docker build -t weather-app-demo .
+   docker build -t weather-app-demo:v1.0.1 .
    ```
 
 3. **Install Docker Compose**: If you don’t have Docker Compose installed, follow the instructions on [Docker Compose installation](https://docs.docker.com/compose/install/).
@@ -103,7 +103,7 @@ This project uses Docker to containerize the application. Follow these steps to 
    Once Docker and Docker Compose are installed, run the following command to start the MongoDB service and the Flask app locally:
 
    ```bash
-   docker-compose up --build
+   docker compose up --build
    ```
 
    This will build the Docker images and start the services defined in the `docker-compose.yml` file, including MongoDB and the Flask app.
@@ -176,16 +176,6 @@ To deploy the project on Google Kubernetes Engine (GKE), follow these additional
       kubectl get pods
       ```
 
-5. **Verify GKE deployment**:
-
-   Once deployed, you can access the application on the external IP of the service. Use the following command to get the external IP:
-
-   ```bash
-   kubectl get svc
-   ```
-
-   Visit the external IP to verify that the app is running.
-
 ### 6. Kubernetes Ingress and CronJob Setup
 
 You can also configure **Ingress** to manage external traffic and set up a **CronJob** for rotating database credentials as mentioned in the project details.
@@ -198,13 +188,25 @@ In order to expose the application externally, you need to configure an **Ingres
 
 The Ingress manifest file is located in the /kubernetes/ directory. Open this file and customize it to match your environment. If you are using a dynamic DNS solution, update the `host` field with your desired DNS name.
 
-1.2 **Apply the Ingress Configuration**
+
+1.2 **Apply the Ingress Configuration.**
+
+1.3 **Verify external access:**
+Once deployed, you can access the application on host. Use the following command to get host:
+
+```bash
+kubectl get ingress
+```
+
+Visit the host to verify that the app is running.
 
 #### 2. **CronJob Setup**:
 
 1.1 **Update the CronJob Manifests**
+
 The CronJob manifest file is located in the /kubernetes/ directory. Open this file and customize it to match your environment.
-2.2 **Apply the Ingress Configuration**
+
+2.2 **Apply the CronJob Configuration.**
 
 ### 7. Using nip.io for DNS
 
