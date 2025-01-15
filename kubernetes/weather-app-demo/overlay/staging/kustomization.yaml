@@ -1,2 +1,2 @@
-bases:
+bases: # Reference to the base manifests
   - ../../base

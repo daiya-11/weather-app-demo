@@ -1,6 +1,27 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: mongo-db
+  name: mongo
 spec:
-  replicas: 2 
+  replicas: 2  # Number of pod replicas to run
+  template:
+    spec:
+      containers:
+        - name: mongo
+          resources: # Resource requests and limits
+            requests:  
+              memory: "512Mi"
+              cpu: "250m"
+            limits: 
+              memory: "1Gi"
+              cpu: "500m"
+          env:
+            - name: MONGO_INITDB_DATABASE
+              value: "weather-db-dev"  # Initial database name
+  volumeClaimTemplates:
+    - metadata:
+        name: mongo-data
+      spec:
+        resources:
+          requests:
+            storage: 5Gi  # Storage size

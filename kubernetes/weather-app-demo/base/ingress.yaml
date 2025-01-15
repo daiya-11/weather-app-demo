@@ -3,16 +3,16 @@ kind: Ingress
 metadata:
   name: weather-app-demo-ingress
 spec:
-  ingressClassName: nginx
+  ingressClassName: nginx # Use nginx ingress controller
   rules:
-  - host: weather-app-staging.34.116.165.112.nip.io
+  - host: weather-app-staging.34.116.165.112.nip.io # Host for the ingress
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: weather-app-demo-service
+            name: weather-app-demo-service # Backend service name
             port:
               number: 5000
 

@@ -1,9 +1,8 @@
-bases:
+bases: # Reference to the base manifests
   - ../../base
 
 patchesStrategicMerge:
-  - deployment-patch.yaml
-  - ingress.yaml
-  - mongo-credentials-patch.yaml
-  - mongo-db-patch.yaml
-
+  - deployment-patch.yaml # Patch for the Deployment resource
+  - ingress.yaml # Configuration for the Ingress resource
+  - mongo-credentials-patch.yaml # Patch for MongoDB credentials (Secret)
+  - mongo-db-patch.yaml # Patch for MongoDB StatefulSet

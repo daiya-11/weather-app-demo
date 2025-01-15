@@ -3,29 +3,29 @@ kind: CronJob
 metadata:
   name: mongo-credential-rotation
 spec:
-  schedule: "*/1 * * * *"
-  concurrencyPolicy: Forbid
+  schedule: "*/1 * * * *" # Run every minute
+  concurrencyPolicy: Forbid # Prevent concurrent jobs
   jobTemplate:
     spec:
       template:
         spec:
-          serviceAccountName: credential-rotator
+          serviceAccountName: credential-rotator # Service account for the job
           containers:
           - name: rotator
-            image: europe-central2-docker.pkg.dev/weather-app-demo-447410/weather-app-demo-images/mongo-rotation:latest
+            image: europe-central2-docker.pkg.dev/weather-app-demo-447410/weather-app-demo-images/mongo-rotation:latest # Image for the rotation script from GCP Artifact Registry
             env:
-            - name: MONGO_INITDB_ROOT_PASSWORD
+            - name: MONGO_INITDB_ROOT_PASSWORD # Pass MongoDB root password from secret
               valueFrom:
                 secretKeyRef:
                   name: mongo-credentials
                   key: MONGO_INITDB_ROOT_PASSWORD
-            command: ["/bin/sh", "/scripts/rotate.sh"]
+            command: ["/bin/sh", "/scripts/rotate.sh"] # Command to run the script
             volumeMounts:
             - name: rotation-scripts
-              mountPath: /scripts
+              mountPath: /scripts # Mount the scripts volume
           volumes:
           - name: rotation-scripts
             configMap:
-              name: rotation-scripts
+              name: rotation-scripts # ConfigMap for the rotation script
               defaultMode: 0755
           restartPolicy: OnFailure

@@ -5,7 +5,7 @@ metadata:
   labels:
     app: weather-app-demo
 spec:
-  replicas: 1
+  replicas: 1 # Number of pod replicas
   selector:
     matchLabels:
       app: weather-app-demo
@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: weather-app-demo-container
-          image: europe-central2-docker.pkg.dev/weather-app-demo-447410/weather-app-demo-images/weather-app-demo:v1.0.4
+          image: europe-central2-docker.pkg.dev/weather-app-demo-447410/weather-app-demo-images/weather-app-demo:v1.0.4 #Container image from GCP Artifact Registry
           ports:
             - containerPort: 5000
           env:
@@ -28,23 +28,23 @@ spec:
             - name: MONGO_USER
               valueFrom:
                 secretKeyRef:
-                  name: mongo-credentials
+                  name: mongo-credentials # Reference to the secret for MongoDB user
                   key: MONGO_INITDB_ROOT_USERNAME
             - name: MONGO_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: mongo-credentials
+                  name: mongo-credentials # Reference to the secret for MongoDB password
                   key: MONGO_INITDB_ROOT_PASSWORD
-          resources:
+          resources: # Resource requests and limits
             requests:
               memory: "64Mi"
               cpu: "100m"
             limits:
               memory: "128Mi"
               cpu: "200m"
-      restartPolicy: Always
+      restartPolicy: Always # Always restart the pods
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 0
+      maxSurge: 1 # Max pods created above the desired replicas
+      maxUnavailable: 0 # Max pods unavailable during update

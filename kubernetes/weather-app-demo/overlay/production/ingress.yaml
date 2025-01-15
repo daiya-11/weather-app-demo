@@ -2,17 +2,16 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: weather-app-demo-ingress
-  annotations:
-    kubernetes.io/ingress.class: "nginx"  
 spec:
+  ingressClassName: nginx # Use nginx ingress controller
   rules:
-    - host: weather-app-demo.com   
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: weather-app-demo-service
-                port:
-                  number: 80
+  - host: weather-app-demo.nip.io # Host for the ingress
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: weather-app-demo-service # Backend service name
+            port:
+              number: 5000

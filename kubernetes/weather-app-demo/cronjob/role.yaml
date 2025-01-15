@@ -4,8 +4,8 @@ metadata:
   name: credential-rotator
 rules:
   - apiGroups: [""]
-    resources: ["secrets"]
-    verbs: ["get", "patch"]
+    resources: ["secrets"] # Access to secrets
+    verbs: ["get", "patch"] # Allowed actions: get and patch secrets
   - apiGroups: ["apps"]
-    resources: ["deployments"]
-    verbs: ["get", "patch"]
+    resources: ["deployments"] # Access to deployments
+    verbs: ["get", "patch"] # Allowed actions: get and patch deployments

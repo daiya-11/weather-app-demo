@@ -5,7 +5,7 @@ metadata:
   labels:
     app: mongo
 spec:
-  type: ClusterIP
+  type: ClusterIP # Exposes the service within the cluster
   selector:
     app: mongo
   ports:

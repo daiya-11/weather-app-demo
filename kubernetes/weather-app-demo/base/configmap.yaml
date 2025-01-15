@@ -3,10 +3,10 @@ kind: ConfigMap
 metadata:
   name: mongo-init-config
 data:
-  mongo-init.js: |
-    db.auth(process.env.MONGO_INITDB_ROOT_USERNAME, process.env.MONGO_INITDB_ROOT_PASSWORD)
-    db = db.getSiblingDB('weather-db-staging')
-    db.createUser({
+  mongo-init.js: | # JavaScript initialization script
+    db.auth(process.env.MONGO_INITDB_ROOT_USERNAME, process.env.MONGO_INITDB_ROOT_PASSWORD) # Authenticate with root credentials
+    db = db.getSiblingDB('weather-db-staging') # Switch to the weather database
+    db.createUser({ # Create root user with readWrite access
       user: process.env.MONGO_INITDB_ROOT_USERNAME,
       pwd: process.env.MONGO_INITDB_ROOT_PASSWORD,
       roles: [{ role: 'readWrite', db: 'weather-db-staging' }]

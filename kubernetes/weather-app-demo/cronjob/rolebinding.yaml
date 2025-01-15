@@ -3,8 +3,8 @@ kind: RoleBinding
 metadata:
   name: credential-rotator
 subjects:
-  - kind: ServiceAccount
-    name: credential-rotator
+  - kind: ServiceAccount 
+    name: credential-rotator # The name of the ServiceAccount being granted the role
 roleRef:
   kind: Role
   name: credential-rotator
