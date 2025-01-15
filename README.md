@@ -3,7 +3,7 @@
 This project involves setting up a web server using Python to proxy requests to the public OpenWeather API. The application is containerized using Docker and connected to a MongoDB database via Docker. Docker Compose is used to run the services locally, and a Kubernetes cluster on GKE orchestrates the solution. The project includes configuring multiple environments (dev, staging, production) using Kustomize, setting up Ingress for pod communication, and managing database credentials securely using Kubernetes secrets. Additionally, a Kubernetes CronJob is implemented to rotate credentials (username and password) and ensure zero downtime during reconnections. The project was deployed on the GKE cluster in the staging environment.
 
 To access the application, visit the following link:
-weather-app-staging.34.116.165.112.nip.io/
+[weather-app-staging.34.116.165.112.nip.io/](weather-app-staging.34.116.165.112.nip.io/)
 
 ## Table of Contents
 
